@@ -1,97 +1,92 @@
-# MentorMap
+# LearnLens: Replicable Classroom Mentoring Framework
 
-> A classroom mentoring analytics prototype for BCA students. A single 5-minute
-> survey produces a clear picture of who needs help, where, and how to start the
-> conversation.
+> A baseline classroom diagnostic and mentoring analytics prototype for programming courses (specifically tailored for BCA cohorts). A single 5-minute survey produces a detailed mentoring snapshot showing who needs help, why they are struggling, and what physical or hardware constraints they face.
 
-MentorMap is a full-stack prototype covering all five modules from the brief:
+LearnLens implements all **five connected modules** outlined in the framework:
 
-1. **Student Survey** — 18 Likert items across 4 sections plus a 4-question
-   programming diagnostic.
-2. **Auto-scoring engine** — computes SHI, SEI, ATI, SWI (each 0–100) and DS
-   (0–4) with reverse-scoring where appropriate, then assigns a Low / Medium /
-   High mentoring tier.
-3. **Teacher dashboard** — protected by a simple login; summary cards, a bar
-   chart of class averages, and a color-coded student roster.
-4. **Per-student mentoring snapshot** — index bars, tier badge, and
-   auto-generated mentoring notes (confidence-building, stress support, study
-   coaching, lab practice).
-5. **ML insights placeholder** — three static cohort cards (Low Confidence,
-   High Stress, Skill Gap) populated from the live data set.
+1. **Module 1: Baseline + Diagnostic Survey** — 18 Likert items assessing psychological & behavioral traits, a 4-question programming diagnostic, and a 3-question hardware/support availability checklist.
+2. **Module 2: Response Sheet** — Simulated storage recording raw submissions (plus replication setups via Google Sheet linking).
+3. **Module 3: Computed Sheet** — Auto-scoring engine calculating SHI, SEI, ATI, SWI (each 0–100) and DS (0–4) with reverse scoring, flagging risk indicators, and assigning Low/Medium/High mentoring tiers.
+4. **Module 4: Mentoring Analysis Dashboard** — An academic panel showing class averages, priority cohorts, hardware constraints, and individual student snapshots with auto-generated coaching notes. Includes an interactive Google Apps Script replication builder.
+5. **Module 5: ML Layer Integration** — A live cohort visualizer combined with a downloadable Python/Colab pipeline script (`learnlens_ml_pipeline.py`) that performs K-Means clustering and Random Forest classification on exported CSV datasets.
 
-The app is seeded with **10 dummy students** so the dashboard is populated on
-first load.
+---
 
-## Stack
+## Technical Stack
 
-- **Frontend** — React 18 + Vite, `react-router-dom`, `recharts`.
-- **Backend** — Node.js + Express, in-memory store (no DB to install).
-- **Design** — navy + white + amber academic palette, mobile-responsive.
+* **Frontend**: React 18, Vite, React Router, Recharts.
+* **Backend**: Node.js, Express, in-memory store.
+* **Design System**: Navy, amber, and teal academic styling, glassmorphism cards, responsive wizard form.
 
-## Project layout
+---
 
-```
-backend/    # Express API and scoring engine
-frontend/   # React + Vite SPA
-```
+## Getting Started (Local Development)
 
-## Run locally
+### Prerequisites
+* Node.js 18+ installed on your system.
 
-You need Node.js 18+.
-
+### 1. Launch the Backend API (Port 4000)
 ```bash
-# 1. Backend — http://localhost:4000
 cd backend
 npm install
 npm start
+```
+* **Teacher Login Password**: `mentor123`
 
-# 2. Frontend — http://localhost:5173 (proxies /api → :4000)
-cd ../frontend
+### 2. Launch the Frontend Dev Server (Port 5173)
+```bash
+cd frontend
 npm install
 npm run dev
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-Open <http://localhost:5173>.
+---
 
-### Prototype credentials
+## Scoring Mechanics & Index Rules
 
-- Teacher login password: `mentor123` (override with `TEACHER_PASSWORD` env var).
-- Teacher routes are gated by a static bearer token returned at login. This is
-  deliberately simple for a prototype — do not ship as-is.
+| Index | Attribute | Scale | Scoring Logic |
+| :--- | :--- | :--- | :--- |
+| **SHI** | Study Habits Index | 0–100 | Plain average of 5 Likert items. |
+| **SEI** | Self-Efficacy Index | 0–100 | Average of 5 Likert items; items 3 and 5 are reverse-scored. |
+| **ATI** | Attention/Thinking Index | 0–100 | Plain average of 4 Likert items. |
+| **SWI** | Stress & Well-being Index | 0–100 | Average of 4 Likert items; **all items are reverse-scored** (higher stress = lower well-being). |
+| **DS** | Diagnostic Skill Score | 0–4 | Total correct responses (+1 per correct answer). |
 
-## Scoring rules
+### Risk Flags & Priority Categorization
+A student is flagged for risk in an index if their score falls below the threshold:
+* `SHI < 60` | `SEI < 60` | `ATI < 60` | `SWI < 60` | `DS < 2`
 
-| Index | Items | Scale | Notes |
-|-------|-------|-------|-------|
-| SHI — Study Habits | 5 Likert | 0–100 | Plain average, rescaled from 1–5 to 0–100. |
-| SEI — Self-Efficacy | 5 Likert | 0–100 | Items 3 and 5 are reverse-scored. |
-| ATI — Attention/Thinking | 4 Likert | 0–100 | Plain average. |
-| SWI — Stress & Well-being | 4 Likert | 0–100 | Every item is reverse-scored — higher stress = lower SWI. |
-| DS — Diagnostic Skill | 4 MCQs | 0–4 raw | Each correct MCQ is +1. |
+**Mentoring Priority Tiers**:
+* **Low Priority**: 0–1 risk flags.
+* **Medium Priority**: 2–3 risk flags.
+* **High Priority**: 4–5 risk flags (or critical hardware/device access issues).
 
-**Risk count** = number of indices below their threshold (SHI<60, SEI<60,
-ATI<60, SWI<60, DS<2).
+---
 
-**Mentoring tier**
+## Classroom Replication & Live Sync (Module 1, 2, & 3 Setup)
 
-- `Low` — risk count 0–1
-- `Medium` — risk count 2–3
-- `High` — risk count 4–5
+LearnLens is built to be easily replicable in any school or college classroom:
+1. Log in to the dashboard as a teacher.
+2. If running locally, you must expose your local server port `4000` to the internet so Google Cloud can reach it. Install and run **ngrok** (or a similar tunneling tool):
+   ```bash
+   ngrok http 4000
+   ```
+3. Copy the public forwarding URL generated by ngrok (e.g. `https://xxxx.ngrok-free.app`).
+4. Paste this URL into the **Public Server Tunnel URL** input field in the dashboard's replication panel.
+5. Click **Generate Google Apps Script Configuration** and copy the code.
+6. Create a new Google Sheet, open **Extensions > Apps Script**, paste the code, and run `setupSurveySystem`.
+7. This automatically creates the Google Form, links it, and sets up a submit trigger that syncs all form entries with your dashboard in real-time.
 
-## API surface
+---
 
-| Method | Path | Auth | Purpose |
-|--------|------|------|---------|
-| GET | `/api/health` | — | Health probe. |
-| GET | `/api/survey/schema` | — | Survey questions (correct answers stripped). |
-| POST | `/api/survey/submit` | — | Submit responses, returns scored snapshot. |
-| POST | `/api/auth/teacher-login` | — | Exchange password for bearer token. |
-| GET | `/api/students` | teacher | Roster + class summary. |
-| GET | `/api/students/:id` | teacher | Full student record. |
-| GET | `/api/ml/clusters` | teacher | Static cluster placeholder. |
+## Machine Learning Integration Pipeline (Module 5)
 
-## Known prototype limitations
-
-- In-memory store — data is lost on backend restart.
-- Static bearer token — no per-user sessions, no expiry, no CSRF.
-- ML insights are deterministic bucketing, not a real model.
+To build predictive tier classifiers and identify behavioral clusters:
+1. Click the **Export Roster to CSV** button on the teacher dashboard to download `learnlens_student_data.csv`.
+2. Click **Download Python ML Pipeline Script** to download `learnlens_ml_pipeline.py`.
+3. Put both files in the same directory and execute:
+   ```bash
+   python3 learnlens_ml_pipeline.py
+   ```
+4. This script scales the features, segments the students into 3 cohorts using **K-Means Clustering**, trains a **Random Forest Classifier** to predict the mentoring tier, and writes the results to `learnlens_ml_enriched_data.csv`.

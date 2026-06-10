@@ -14,13 +14,15 @@ export function isTeacher() {
   return !!getTeacherToken();
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 async function request(path, { method = "GET", body, auth = false } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (auth) {
     const token = getTeacherToken();
     if (token) headers.Authorization = `Bearer ${token}`;
   }
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}/api${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined
@@ -43,5 +45,6 @@ export const api = {
     request("/auth/teacher-login", { method: "POST", body: { password } }),
   students: () => request("/students", { auth: true }),
   student: (id) => request(`/students/${id}`, { auth: true }),
-  clusters: () => request("/ml/clusters", { auth: true })
+  clusters: () => request("/ml/clusters", { auth: true }),
+  appsScript: (serverUrl) => request(`/replication/apps-script?serverUrl=${encodeURIComponent(serverUrl || "")}`, { auth: true })
 };

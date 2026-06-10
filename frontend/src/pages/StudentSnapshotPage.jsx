@@ -38,13 +38,14 @@ export default function StudentSnapshotPage() {
   }
   if (!student) {
     return (
-      <div className="card">
-        <p>Loading snapshot…</p>
+      <div className="card text-center">
+        <p>Loading student mentoring profile…</p>
       </div>
     );
   }
 
-  const { scores, notes } = student;
+  const { scores, notes, metadata } = student;
+  const m = metadata || {};
 
   return (
     <>
@@ -71,6 +72,41 @@ export default function StudentSnapshotPage() {
             <div className="subtle" style={{ marginTop: 6 }}>
               Risk count {scores.risk_count} / 5
             </div>
+          </div>
+        </div>
+
+        {/* Demographics & Hardware Profile */}
+        <div className="hardware-checklist-row" style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+          <div className="checklist-item">
+            <span>Stream: <strong>{m.stream || "Science"}</strong></span>
+          </div>
+          <div className="checklist-item">
+            <span>Prior Coding: <strong>{m.prior_coding || "No"}</strong></span>
+          </div>
+          <div className="checklist-item">
+            <span>Device Availability: <strong>{m.device_availability || "Laptop + Phone"}</strong></span>
+          </div>
+          <div className="checklist-item">
+            <span>Study Hours: <strong>{m.study_hours || 0}h/day</strong></span>
+          </div>
+          <div className="checklist-item">
+            <span>Sleep Hours: <strong>{m.sleep_hours || 0}h/night</strong></span>
+          </div>
+        </div>
+
+        {/* Confusing Concepts & Request Support */}
+        <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--slate-200)" }}>
+          <div>
+            <strong>Confusing Programming Concepts:</strong>
+            <p style={{ margin: "4px 0 0 0", color: "var(--slate-700)", fontStyle: m.confusing_part ? "normal" : "italic" }}>
+              {m.confusing_part || "No specific bottleneck mentioned."}
+            </p>
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <strong>Preferred Mentoring Support:</strong>{" "}
+            <span className="coming-soon" style={{ marginLeft: 0, textTransform: "none", background: "var(--navy-100)" }}>
+              {m.support_type || "Peer study group"}
+            </span>
           </div>
         </div>
       </div>
@@ -100,7 +136,7 @@ export default function StudentSnapshotPage() {
           />
           <IndexBar
             label="Diagnostic Skill"
-            sublabel="DS — concept MCQs (0–4)"
+            sublabel="DS — concept MCQs & Code (0–4)"
             value={(scores.DS / 4) * 100}
             raw={scores.DS}
           />
