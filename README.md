@@ -65,6 +65,7 @@ A student is flagged for risk in an index if their score falls below the thresho
 ---
 
 ## Classroom Replication & Live Sync (Module 1, 2, & 3 Setup)
+Working.
 
 LearnLens is built to be easily replicable in any school or college classroom:
 1. Log in to the dashboard as a teacher.
@@ -90,3 +91,9 @@ To build predictive tier classifiers and identify behavioral clusters:
    python3 learnlens_ml_pipeline.py
    ```
 4. This script scales the features, segments the students into 3 cohorts using **K-Means Clustering**, trains a **Random Forest Classifier** to predict the mentoring tier, and writes the results to `learnlens_ml_enriched_data.csv`.
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](file:///home/pacific/LearnLens/LICENSE) file for details.
